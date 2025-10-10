@@ -1,0 +1,11 @@
+name = "ned"
+description = "new editor"
+version = "0.1.0-dev"
+
+authors = ["Patrick Günthard"]
+maintainers = ["Patrick Günthard <me@patrickguenthard.ch>"]
+maintainers-logins = ["patrickgue"]
+licenses = "GPL-3.0-or-later"
+website = ""
+tags = []
+
