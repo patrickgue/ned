@@ -75,7 +75,6 @@ package body VT100 is
       end case;
    end Line_Wrapping;
 
-
    -----------------------------
    --  S A V E _ S C R E E N  --
    -----------------------------
@@ -86,18 +85,19 @@ package body VT100 is
       Ada.Text_IO.Put
         (File => Ada.Text_IO.Standard_Output,
         Item => ASCII.ESC & "[?47h");
-   end;
+   end Save_Screen;
 
    -----------------------------------
    --  R E S T O R E _ S C R E E N  --
    -----------------------------------
+
    procedure Restore_Screen
    is
    begin
       Ada.Text_IO.Put
         (File => Ada.Text_IO.Standard_Output,
         Item => ASCII.ESC & "[?47l");
-   end;
+   end Restore_Screen;
 
    -------------------------------------
    -- U S E _ D E F A U L T _ F O N T --
