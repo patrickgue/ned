@@ -16,7 +16,6 @@
 -- action of contract, negligence or other tortious action, arising out of  --
 -- or in connection with the use or performance of this software.           --
 ------------------------------------------------------------------------------
-with Ada.Environment_Variables;
 package body VT100.Utils is
 
    -----------------
@@ -26,11 +25,7 @@ package body VT100.Utils is
    function Lines return Natural
    is
    begin
-      if Ada.Environment_Variables.Exists ("LINES") then
-         return Natural'Value (Ada.Environment_Variables.Value (Name => "LINES"));
-      else
-         return 0;
-      end if;
+      return Natural (Term_Lines);
    end Lines;
 
    ---------------------
@@ -40,12 +35,7 @@ package body VT100.Utils is
    function Columns return Natural
    is
    begin
-      if Ada.Environment_Variables.Exists ("COLUMNS") then
-         return Natural'Value (Ada.Environment_Variables.Value
-           (Name => "COLUMNS"));
-      else
-         return 0;
-      end if;
+      return Natural (Term_Cols);
    end Columns;
 
 end VT100.Utils;
