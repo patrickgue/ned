@@ -1,9 +1,6 @@
 -------------------------------------------------------------------------------
---  EMAIL: <patrick@cybersyn.dev>                                            --
---  License: ISC License (see COPYING file)                                  --
---                                                                           --
---         Copyright © 2012 - 2015 darkestkhan <darkestkhan@gmail.com>       --
---         Copyright © 2025        patrickgue <patrick@cybersyn.dev>         --
+-- Copyright © 2011 - 2015 darkestkhan licensed under ISC                   --
+-- Modifications Copyright © 2025 patrickgue licensed under GNU GPL v3      --
 -------------------------------------------------------------------------------
 --  Permission to use, copy, modify, and/or distribute this software for any --
 --  purpose with or without fee is hereby granted, provided that the above   --
