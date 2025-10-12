@@ -1,8 +1,9 @@
 ------------------------------------------------------------------------------
--- EMAIL: <darkestkhan@gmail.com>                                           --
+-- EMAIL: <patrick@cybersyn.dev>                                            --
 -- License: ISC License (see COPYING file)                                  --
 --                                                                          --
 --                    Copyright © 2011 - 2015 darkestkhan                   --
+--                    Copyright © 2025        patrickgue                    --
 ------------------------------------------------------------------------------
 -- Permission to use, copy, modify, and/or distribute this software for any --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -18,6 +19,8 @@
 ------------------------------------------------------------------------------
 --  TODO:
 --  - finish adding escape codes [cursor controls]
+--  Changes
+--  - patrickgue: Implement saving and restoring of terminal contents
 with Ada.Text_IO;
 with Ada.Characters.Latin_1;
 package body VT100 is
@@ -71,6 +74,30 @@ package body VT100 is
               Item => ASCII.ESC & "[7h");
       end case;
    end Line_Wrapping;
+
+
+   -----------------------------
+   --  S A V E _ S C R E E N  --
+   -----------------------------
+
+   procedure Save_Screen
+   is
+   begin
+      Ada.Text_IO.Put
+        (File => Ada.Text_IO.Standard_Output,
+        Item => ASCII.ESC & "[?47h");
+   end;
+
+   -----------------------------------
+   --  R E S T O R E _ S C R E E N  --
+   -----------------------------------
+   procedure Restore_Screen
+   is
+   begin
+      Ada.Text_IO.Put
+        (File => Ada.Text_IO.Standard_Output,
+        Item => ASCII.ESC & "[?47l");
+   end;
 
    -------------------------------------
    -- U S E _ D E F A U L T _ F O N T --

@@ -31,6 +31,12 @@ package VT100 is
    --  If state is True then text wraps to next line if longer than the length
    --  of the display area.
 
+   --  Save current screen content
+   procedure Save_Screen;
+
+   --  Restore previously saved screen content
+   procedure Restore_Screen;
+
    -----------------
    --  F O N T S  --
    -----------------
