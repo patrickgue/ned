@@ -1,7 +1,6 @@
 with VT100; use VT100;
 with VT100.Utils;
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
-with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Containers.Vectors;
 with Ada.Characters.Conversions; use Ada.Characters.Conversions;
 with Editor; use Editor;
@@ -15,57 +14,88 @@ procedure Ned is
    V : Char_Vectors.Vector;
 
    Curr_Buff :  Buffer;
-   I : Integer;
-   Win_X : constant Natural := 0;
-   Win_Y : constant Natural := 1;
    In_Ch : Wide_Wide_Character := To_Wide_Wide_Character (ASCII.NUL);
    Pos : Integer := 0;
+   Esc : Boolean := False;
+   Main_Loop : Boolean := True;
 
-   function WWS (Inp : String) return Wide_Wide_String renames To_Wide_Wide_String;
+   function WWS (Inp : String)
+                return Wide_Wide_String
+     renames To_Wide_Wide_String;
 begin
    Save_Screen;
-
+   Curr_Buff.Pos_Line_Nr := 0;
+   Curr_Buff.Pos_On_Line := 0;
    Add_Line (Curr_Buff, "Hello World");
    Add_Line (Curr_Buff, "Lorem Ipsum");
    Add_Line (Curr_Buff, "Hellö in UTF-8  漢字");
    Add_Line (Curr_Buff, "This Line is longer than 100 characters. This Line is longer than 100 characters. This Line is longer than 100 characters.");
 
-   while Pos /= 27 loop
+   for I in 1 .. 100 loop
+      Add_Line (Curr_Buff, "Hello");
+   end loop;
+
+   while Main_Loop loop
       Clear_Screen;
 
-      for I in Curr_Buff.Lines.First_Index .. Curr_Buff.Lines.Last_Index loop
-         Move_Cursor (Win_Y + Natural (I), Win_X);
-         declare
-            Content_Line : constant Line_Type := Curr_Buff.Lines (Natural (I));
-            Limit : Natural := VT100.Utils.Columns;
-         begin
-            if Length (Content_Line.Content) < Limit then
-               Limit := Length (Content_Line.Content);
-            end if;
-            Put_Line (To_Wide_Wide_String (Content_Line.Content) (1 .. Limit));
-         end;
-      end loop;
+      Render_Buffer (Curr_Buff, VT100.Utils.Lines - 2);
+      Move_Cursor (VT100.Utils.Lines, 1);
 
       Set_Background_Color (Blue);
       Set_Foreground_Color (White);
 
-      Move_Cursor (VT100.Utils.Lines, 1);
-
       Put (WWS (
-        Natural'Image (I) & " " &
-        Natural'Image (Curr_Buff.Lines.First_Index) & " " &
-        Natural'Image (Curr_Buff.Lines.Last_Index) & " " &
-        Natural'Image (VT100.Utils.Columns) & " '") &
-        In_Ch & "'");
+        "L:" & Natural'Image (Curr_Buff.Pos_Line_Nr) &
+        " C:" & Natural'Image (Curr_Buff.Pos_On_Line)));
 
       for E of V loop
          Put (WWS (" ") & WWS (Integer'Image (Wide_Wide_Character'Pos (E))));
       end loop;
-      Set_Attribute (Reset);
+      Set_Background_Color (Default);
+      Set_Foreground_Color (Default);
 
       Get_Immediate (In_Ch);
       Pos := Wide_Wide_Character'Pos (In_Ch);
       V.Append (In_Ch);
+      if Natural (V.Length) > 10 then
+         V.Delete (V.First_Index);
+      end if;
+      if Pos >= 32 and then Pos /= 127 then
+         if Esc then
+            case In_Ch is
+               when 'x' => Main_Loop := False;
+               when 'A' | 'k' => Move_Cursor (Curr_Buff, Up);
+               when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
+               when 'C' | 'l' => Move_Cursor (Curr_Buff, Right);
+               when 'D' | 'h' => Move_Cursor (Curr_Buff, Left);
+               when others => null; -- other keys can be ignored
+            end case;
+
+            --  arrow keys are ESC[A|B|C|D -> keep ESC := True
+            if Pos /= 91 then
+               Esc := False;
+            end if;
+         else
+            Insert_Char_At_Pos (Curr_Buff, In_Ch);
+         end if;
+      else
+         case Pos is
+            when 1 => Move_Cursor (Curr_Buff, Start);
+            when 2 => Move_Cursor (Curr_Buff, Left);
+            when 5 => Move_Cursor (Curr_Buff, End_Line);
+            when 6 => Move_Cursor (Curr_Buff, Right);
+            when 14 => Move_Cursor (Curr_Buff, Down);
+            when 16 => Move_Cursor (Curr_Buff, Up);
+            when 27 => Esc := True;
+            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward);
+
+
+
+
+
+            when others => null;
+         end case;
+      end if;
    end loop;
    Restore_Screen;
 end Ned;
