@@ -1,4 +1,21 @@
 ned editor
-----------
+==========
 
 simple editor written in Ada
+
+THIS IS UNDER CONSTRUCTION
+
+
+build instructions
+------------------
+
+The alire build tool is required for building this application. https://alire.ada.dev/
+
+`alr build` should suffice
+
+license and credit
+------------------
+
+This application is licenced under the ISC
+
+The ANSI terminal code is based on https://github.com/darkestkhan/vt100

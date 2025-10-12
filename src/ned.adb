@@ -88,11 +88,6 @@ begin
             when 16 => Move_Cursor (Curr_Buff, Up);
             when 27 => Esc := True;
             when 127 => Delete_Char_At_Pos (Curr_Buff, Backward);
-
-
-
-
-
             when others => null;
          end case;
       end if;
