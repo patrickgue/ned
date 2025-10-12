@@ -387,6 +387,24 @@ package body VT100 is
         Item => ASCII.ESC & '[' & C & 'm');
    end Set_Attribute;
 
+   procedure Reset_Attribute (Attr : Attribute)
+   is
+      C : Character;
+   begin
+      case Attr is
+         when Bold       => C := '1';
+         when Dim        => C := '2';
+         when Underline  => C := '4';
+         when Blink      => C := '5';
+         when Revers     => C := '7';
+         when Hidden     => C := '8';
+         when others     => null; --  ignore
+      end case;
+      Ada.Text_IO.Put
+        (File => Ada.Text_IO.Standard_Output,
+        Item => ASCII.ESC & "[2" & C & 'm');
+   end Reset_Attribute;
+
    ---------------------------------------------
    -- S E T _ B A C K G R O U N D _ C O L O R --
    ---------------------------------------------

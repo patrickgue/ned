@@ -146,6 +146,8 @@ package VT100 is
      (This : Attribute);
    --  Sets attribute on.
 
+   procedure Reset_Attribute (Attr : Attribute);
+
    ---------------------------------
    --  C O L O R   S E T T I N G  --
    ---------------------------------
