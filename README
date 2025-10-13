@@ -3,8 +3,9 @@ ned editor
 
 simple editor written in Ada
 
-THIS IS UNDER CONSTRUCTION
-
+This app is still under construction. Basic editing, loading and saving from and 
+to files work. There still are major bugs, if the program crashes you could loose
+your data.
 
 build instructions
 ------------------
