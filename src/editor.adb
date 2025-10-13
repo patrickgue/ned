@@ -84,7 +84,8 @@ package body Editor is
          if Buff.Pos_On_Line > 0 then
             declare
                Line_Str : constant Wide_Wide_String
-                 := To_Wide_Wide_String (Buff.Lines (Buff.Pos_Line_Nr).Content);
+                 := To_Wide_Wide_String (
+                 Buff.Lines (Buff.Pos_Line_Nr).Content);
 
                First_Half : constant Wide_Wide_String
                  := Line_Str (1 .. Buff.Pos_On_Line - 1);
@@ -95,12 +96,13 @@ package body Editor is
                  := To_Unbounded_Wide_Wide_String (First_Half & Second_Half);
                Buff.Pos_On_Line := Buff.Pos_On_Line - 1;
             end;
-         --  At the beginning of the line; combine with the previous line
-         else
-            --  Only run if cursor is on first line, else do nothing
+
+         else --  At the beginning of the line; combine with the previous line
+            --  Only run if cursor is not on first line, else do nothing
             if Buff.Pos_Line_Nr > 0 then
                declare
-                  Old_Len : Natural := Length (Buff.Lines (Buff.Pos_Line_Nr - 1).Content);
+                  Old_Len : constant Natural
+                    := Length (Buff.Lines (Buff.Pos_Line_Nr - 1).Content);
                begin
                   Buff.Lines (Buff.Pos_Line_Nr - 1).Content :=
                     Buff.Lines (Buff.Pos_Line_Nr - 1).Content &
@@ -113,7 +115,31 @@ package body Editor is
          end if;
       --  forward
       else
-         null;
+         if Buff.Pos_On_Line < Length (Buff.Lines (Buff.Pos_Line_Nr).Content)
+         then
+            declare
+               Line_Str : constant Wide_Wide_String
+                 := To_Wide_Wide_String (
+                 Buff.Lines (Buff.Pos_Line_Nr).Content);
+
+               First_Half : constant Wide_Wide_String
+                 := Line_Str (1 .. Buff.Pos_On_Line);
+               Second_Half : constant Wide_Wide_String
+                 := Line_Str (Buff.Pos_On_Line + 2 .. Line_Str'Length);
+            begin
+               Buff.Lines (Buff.Pos_Line_Nr).Content
+                 := To_Unbounded_Wide_Wide_String (First_Half & Second_Half);
+            end;
+         else --  At the end of the line; combine with the next line
+            --  Only run if cursor is not on last line. Else do nothing
+            if Buff.Pos_Line_Nr < Buff.Lines.Last_Index then
+               Buff.Lines (Buff.Pos_Line_Nr).Content :=
+                 Buff.Lines (Buff.Pos_Line_Nr).Content &
+                 Buff.Lines (Buff.Pos_Line_Nr + 1).Content;
+               Buff.Lines.Delete (Buff.Pos_Line_Nr + 1);
+            end if;
+         end if;
+
       end if;
    end Delete_Char_At_Pos;
 
@@ -133,7 +159,7 @@ package body Editor is
       Second_Half : constant Wide_Wide_String
         := Line_Str (First_Index + Buff.Pos_On_Line .. Last_Index);
    begin
-      Buff.Lines.Insert (Natural(Buff.Pos_Line_Nr + 1),
+      Buff.Lines.Insert (Natural (Buff.Pos_Line_Nr + 1),
         (Content => To_Unbounded_Wide_Wide_String (Second_Half)));
       Buff.Lines (Buff.Pos_Line_Nr).Content
         := To_Unbounded_Wide_Wide_String (First_Half);

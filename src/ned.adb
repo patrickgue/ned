@@ -92,10 +92,15 @@ begin
                when others => null; -- other keys can be ignored
             end case;
 
+            if Pos = 126 then
+               Delete_Char_At_Pos (Curr_Buff, Forward);
+            end if;
+
             --  arrow keys are ESC[A|B|C|D -> keep ESC := True
-            if Pos /= 91 then
+            if Pos /= 91 and then Pos /= 51 then
                Esc := False;
             end if;
+
          else
             Insert_Char_At_Pos (Curr_Buff, In_Ch);
          end if;
