@@ -22,9 +22,13 @@
 with VT100; use VT100;
 with VT100.Utils;
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Containers.Vectors;
 with Ada.Characters.Conversions; use Ada.Characters.Conversions;
+with Ada.Command_Line; use Ada.Command_Line;
+
 with Editor; use Editor;
+with File_Utils; use File_Utils;
 
 procedure Ned is
    package Char_Vectors is new
@@ -39,22 +43,23 @@ procedure Ned is
    Pos : Integer := 0;
    Esc : Boolean := False;
    Main_Loop : Boolean := True;
+   File_Name : Unbounded_Wide_Wide_String
+     := To_Unbounded_Wide_Wide_String ("UNTITLED");
+   Edited : Boolean := True;
 
    function WWS (Inp : String)
                 return Wide_Wide_String
      renames To_Wide_Wide_String;
 begin
+   if Argument_Count >= 1 then
+      File_Name := To_Unbounded_Wide_Wide_String (WWS (Argument (1)));
+      Read_File_To_Buffer (Curr_Buff, Argument (1));
+   else
+      Add_Line (Curr_Buff, "");
+   end if;
    Save_Screen;
    Curr_Buff.Pos_Line_Nr := 0;
    Curr_Buff.Pos_On_Line := 0;
-   Add_Line (Curr_Buff, "Hello World");
-   Add_Line (Curr_Buff, "Lorem Ipsum");
-   Add_Line (Curr_Buff, "Hellö in UTF-8  漢字");
-   Add_Line (Curr_Buff, "This Line is longer than 100 characters. This Line is longer than 100 characters. This Line is longer than 100 characters.");
-
-   for I in 1 .. 100 loop
-      Add_Line (Curr_Buff, "Hello");
-   end loop;
 
    while Main_Loop loop
       Clear_Screen;
@@ -65,8 +70,14 @@ begin
       Set_Background_Color (Blue);
       Set_Foreground_Color (White);
 
+      if Edited then
+         Put ("*");
+      else
+         Put (" ");
+      end if;
+      Put (To_Wide_Wide_String (File_Name));
       Put (WWS (
-        "L:" & Natural'Image (Curr_Buff.Pos_Line_Nr) &
+        " L:" & Natural'Image (Curr_Buff.Pos_Line_Nr) &
         " C:" & Natural'Image (Curr_Buff.Pos_On_Line)));
 
       for E of V loop
@@ -85,6 +96,9 @@ begin
          if Esc then
             case In_Ch is
                when 'x' => Main_Loop := False;
+               when 'w' => Write_File_From_Buffer (Curr_Buff,
+                  To_String (
+                  To_Wide_Wide_String (File_Name))); Edited := False;
                when 'A' | 'k' => Move_Cursor (Curr_Buff, Up);
                when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
                when 'C' | 'l' => Move_Cursor (Curr_Buff, Right);
@@ -94,6 +108,7 @@ begin
 
             if Pos = 126 then
                Delete_Char_At_Pos (Curr_Buff, Forward);
+               Edited := True;
             end if;
 
             --  arrow keys are ESC[A|B|C|D -> keep ESC := True
@@ -103,6 +118,7 @@ begin
 
          else
             Insert_Char_At_Pos (Curr_Buff, In_Ch);
+            Edited := True;
          end if;
       else
          case Pos is
@@ -110,11 +126,11 @@ begin
             when 2 => Move_Cursor (Curr_Buff, Left);
             when 5 => Move_Cursor (Curr_Buff, End_Line);
             when 6 => Move_Cursor (Curr_Buff, Right);
-            when 10 => Newline_At_Pos (Curr_Buff);
+            when 10 => Newline_At_Pos (Curr_Buff); Edited := True;
             when 14 => Move_Cursor (Curr_Buff, Down);
             when 16 => Move_Cursor (Curr_Buff, Up);
             when 27 => Esc := True;
-            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward);
+            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward); Edited := True;
             when others => null;
          end case;
       end if;

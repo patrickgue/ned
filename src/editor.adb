@@ -238,7 +238,7 @@ package body Editor is
          Move_Cursor (1 + Natural (I) - First_Line_Index, 0);
          Set_Attribute (Dim);
          Put (To_Wide_Wide_String (Tail (
-           To_Unbounded_Wide_Wide_String (Integer'Wide_Wide_Image (I)), 4, ' ')
+           To_Unbounded_Wide_Wide_String (Integer'Wide_Wide_Image (I + 1)), 4, ' ')
                                   ) & " ");
          Reset_Attribute (Dim);
          declare

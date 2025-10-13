@@ -1,8 +1,7 @@
-/*
 ----------------------------------------------------------------------------
---  TERMSIZE.C                                                            --
+--  FILE-UTILS.ADS                                                        --
 ----------------------------------------------------------------------------
---  utility for fetching terminal size                                    --
+--  file utilities definitions                                            --
 ----------------------------------------------------------------------------
 --  Copyright (C) 2025 Patrick Günthard                                   --
 --                                                                        --
@@ -19,21 +18,10 @@
 --  You should have received a copy of the GNU General Public License     --
 --  along with this program.  If not, see <https://www.gnu.org/licenses/>.--
 ----------------------------------------------------------------------------
- */
-#include <sys/ioctl.h>
-#include <unistd.h>
 
-int term_cols()
-{
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    return w.ws_col;
-}
+with Editor; use Editor;
 
-
-int term_lines()
-{
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    return w.ws_row;
-}
+package File_Utils is
+   procedure Read_File_To_Buffer (Buff : in out Buffer; File_Name : String);
+   procedure Write_File_From_Buffer (Buff : Buffer; File_Name : String);
+end File_Utils;

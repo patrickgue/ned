@@ -1,8 +1,7 @@
-/*
 ----------------------------------------------------------------------------
---  TERMSIZE.C                                                            --
+--  FILE-UTILS.ADS                                                        --
 ----------------------------------------------------------------------------
---  utility for fetching terminal size                                    --
+--  file utilities                                                        --
 ----------------------------------------------------------------------------
 --  Copyright (C) 2025 Patrick Günthard                                   --
 --                                                                        --
@@ -19,21 +18,30 @@
 --  You should have received a copy of the GNU General Public License     --
 --  along with this program.  If not, see <https://www.gnu.org/licenses/>.--
 ----------------------------------------------------------------------------
- */
-#include <sys/ioctl.h>
-#include <unistd.h>
 
-int term_cols()
-{
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    return w.ws_col;
-}
+with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
+with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 
+package body File_Utils is
+   procedure Read_File_To_Buffer (Buff : in out Buffer; File_Name : String)
+   is
+         F : File_Type;
+   begin
+      Open (F, In_File, File_Name);
+      while not End_Of_File (F) loop
+         Add_Line (Buff, Get_Line (F));
+      end loop;
+      Close (F);
+   end Read_File_To_Buffer;
 
-int term_lines()
-{
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    return w.ws_row;
-}
+   procedure Write_File_From_Buffer (Buff : Buffer; File_Name : String)
+   is
+      F : File_Type;
+   begin
+      Open (F, Out_File, File_Name);
+      for I in Buff.Lines.First_Index .. Buff.Lines.Last_Index loop
+         Put_Line (F, To_Wide_Wide_String (Buff.Lines (I).Content));
+      end loop;
+      Close (F);
+   end Write_File_From_Buffer;
+end File_Utils;
