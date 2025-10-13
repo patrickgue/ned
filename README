@@ -14,6 +14,25 @@ The alire build tool is required for building this application. https://alire.ad
 
 `alr build` should suffice
 
+usage
+-----
+
+ned supports basic editing commands found in emacs and vi. Because modes are avoided, 
+vi-commands need to be prefixed with the [alt] key:
+
+  [alt]-x                        Exit ned
+  [alt]-w                        Save file
+
+  [alt]-h | [C]-b | Arrow left   Cursor Left
+  [alt]-j | [C]-n | Arrow down   Cursor Down
+  [alt]-k | [C]-p | Arrow up     Cursor Up
+  [alt]-l | [C]-f | Arrow right  Cursor Right
+            [C]-e                Cursor to End of line
+            [C]-a                Cursor to Start of line
+
+                    Backspace    Backward delete
+                    Delete       Forward delete
+
 license and credit
 ------------------
 
