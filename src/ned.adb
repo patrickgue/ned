@@ -105,6 +105,7 @@ begin
             when 2 => Move_Cursor (Curr_Buff, Left);
             when 5 => Move_Cursor (Curr_Buff, End_Line);
             when 6 => Move_Cursor (Curr_Buff, Right);
+            when 10 => Newline_At_Pos (Curr_Buff);
             when 14 => Move_Cursor (Curr_Buff, Down);
             when 16 => Move_Cursor (Curr_Buff, Up);
             when 27 => Esc := True;

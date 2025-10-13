@@ -44,6 +44,7 @@ package Editor is
    procedure Update_Buffer_Pos_Abs (Buff : in out Buffer);
    procedure Insert_Char_At_Pos
      (Buff : in out Buffer; Char : Wide_Wide_Character);
+   procedure Newline_At_Pos (Buff : in out Buffer);
 
    type Delete_Direction is (Forward, Backward);
    procedure Delete_Char_At_Pos (Buff : in out Buffer; Dir : Delete_Direction);

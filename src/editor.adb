@@ -19,11 +19,16 @@
 --  along with this program.  If not, see <https://www.gnu.org/licenses/>.--
 ----------------------------------------------------------------------------
 
-with VT100; use VT100;
-with VT100.Utils;
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 
+with VT100; use VT100;
+with VT100.Utils;
+
 package body Editor is
+   -----------------------
+   --  A D D _ L I N E  --
+   -----------------------
+
    procedure Add_Line (Buff : in out Buffer; Content : Wide_Wide_String)
    is
       Tmp : Line_Type :=
@@ -31,6 +36,10 @@ package body Editor is
    begin
       Buff.Lines.Append (Tmp);
    end Add_Line;
+
+   -------------------------------------------------
+   --  U P D A T E _ B U F F E R _ P O S _ A B S  --
+   -------------------------------------------------
 
    procedure Update_Buffer_Pos_Abs (Buff : in out Buffer)
    is
@@ -42,6 +51,10 @@ package body Editor is
       end loop;
       Buff.Pos_Abs := Count + Buff.Pos_On_Line;
    end Update_Buffer_Pos_Abs;
+
+   -------------------------------------------
+   --  I N S E R T _ C H A R _ A T _ P O S  --
+   -------------------------------------------
 
    procedure Insert_Char_At_Pos (Buff : in out Buffer;
                                  Char : Wide_Wide_Character)
@@ -59,10 +72,15 @@ package body Editor is
       Buff.Pos_On_Line := Buff.Pos_On_Line + 1;
    end Insert_Char_At_Pos;
 
+   -------------------------------------------
+   --  D E L E T E _ C H A R _ A T _ P O S  --
+   -------------------------------------------
+
    procedure Delete_Char_At_Pos (Buff : in out Buffer; Dir : Delete_Direction)
    is
    begin
       if Dir = Backward then
+         --  Somewhere inside the line
          if Buff.Pos_On_Line > 0 then
             declare
                Line_Str : constant Wide_Wide_String
@@ -77,9 +95,51 @@ package body Editor is
                  := To_Unbounded_Wide_Wide_String (First_Half & Second_Half);
                Buff.Pos_On_Line := Buff.Pos_On_Line - 1;
             end;
+         --  At the beginning of the line; combine with the previous line
+         else
+            --  Only run if cursor is on first line, else do nothing
+            if Buff.Pos_Line_Nr > 0 then
+               declare
+                  Old_Len : Natural := Length (Buff.Lines (Buff.Pos_Line_Nr - 1).Content);
+               begin
+                  Buff.Lines (Buff.Pos_Line_Nr - 1).Content :=
+                    Buff.Lines (Buff.Pos_Line_Nr - 1).Content &
+                    Buff.Lines (Buff.Pos_Line_Nr).Content;
+                  Buff.Lines.Delete (Buff.Pos_Line_Nr);
+                  Buff.Pos_Line_Nr := Buff.Pos_Line_Nr - 1;
+                  Buff.Pos_On_Line := Old_Len;
+               end;
+            end if;
          end if;
+      --  forward
+      else
+         null;
       end if;
    end Delete_Char_At_Pos;
+
+   -----------------------------------
+   --  N E W L I N E _ A T _ P O S  --
+   -----------------------------------
+
+   procedure Newline_At_Pos (Buff : in out Buffer)
+   is
+      Line_Str : constant Wide_Wide_String
+        := To_Wide_Wide_String (Buff.Lines (Buff.Pos_Line_Nr).Content);
+      First_Index : constant Integer := Line_Str'First;
+      Last_Index : constant Integer := Line_Str'Last;
+
+      First_Half : constant Wide_Wide_String
+        := Line_Str (First_Index .. First_Index + Buff.Pos_On_Line - 1);
+      Second_Half : constant Wide_Wide_String
+        := Line_Str (First_Index + Buff.Pos_On_Line .. Last_Index);
+   begin
+      Buff.Lines.Insert (Natural(Buff.Pos_Line_Nr + 1),
+        (Content => To_Unbounded_Wide_Wide_String (Second_Half)));
+      Buff.Lines (Buff.Pos_Line_Nr).Content
+        := To_Unbounded_Wide_Wide_String (First_Half);
+      Buff.Pos_Line_Nr := Buff.Pos_Line_Nr + 1;
+      Buff.Pos_On_Line := 0;
+   end Newline_At_Pos;
 
    procedure Move_Cursor (Buff : in out Buffer; Mov : Virt_Cursor_Movement)
    is
