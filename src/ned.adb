@@ -26,6 +26,7 @@ with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Containers.Vectors;
 with Ada.Characters.Conversions; use Ada.Characters.Conversions;
 with Ada.Command_Line; use Ada.Command_Line;
+with Ada.IO_Exceptions;
 
 with Editor; use Editor;
 with File_Utils; use File_Utils;
@@ -86,8 +87,13 @@ begin
       Set_Background_Color (Default);
       Set_Foreground_Color (Default);
 
-      Get_Immediate (In_Ch);
-      Pos := Wide_Wide_Character'Pos (In_Ch);
+      begin
+         Get_Immediate (In_Ch);
+         Pos := Wide_Wide_Character'Pos (In_Ch);
+      exception
+         when Ada.IO_Exceptions.End_Error => Pos := 4;
+      end;
+
       V.Append (In_Ch);
       if Natural (V.Length) > 10 then
          V.Delete (V.First_Index);
@@ -122,13 +128,14 @@ begin
          end if;
       else
          case Pos is
-            when 1 => Move_Cursor (Curr_Buff, Start);
-            when 2 => Move_Cursor (Curr_Buff, Left);
-            when 5 => Move_Cursor (Curr_Buff, End_Line);
-            when 6 => Move_Cursor (Curr_Buff, Right);
-            when 10 => Newline_At_Pos (Curr_Buff); Edited := True;
-            when 14 => Move_Cursor (Curr_Buff, Down);
-            when 16 => Move_Cursor (Curr_Buff, Up);
+            when 1 => Move_Cursor (Curr_Buff, Start);              --  C-a
+            when 2 => Move_Cursor (Curr_Buff, Left);               --  C-b
+            when 4 => Delete_Char_At_Pos (Curr_Buff, Forward);     --  C-d
+            when 5 => Move_Cursor (Curr_Buff, End_Line);           --  C-e
+            when 6 => Move_Cursor (Curr_Buff, Right);              --  C-f
+            when 10 => Newline_At_Pos (Curr_Buff); Edited := True; --  Enter
+            when 14 => Move_Cursor (Curr_Buff, Down);              --  C-n
+            when 16 => Move_Cursor (Curr_Buff, Up);                --  C-p
             when 27 => Esc := True;
             when 127 => Delete_Char_At_Pos (Curr_Buff, Backward); Edited := True;
             when others => null;
