@@ -27,6 +27,7 @@ with Ada.Containers.Vectors;
 with Ada.Characters.Conversions; use Ada.Characters.Conversions;
 with Ada.Command_Line; use Ada.Command_Line;
 with Ada.IO_Exceptions;
+with Ada.Strings.Fixed;
 
 with Editor; use Editor;
 with File_Utils; use File_Utils;
@@ -35,7 +36,7 @@ procedure Ned is
    package Char_Vectors is new
      Ada.Containers.Vectors
      (Index_Type   => Natural,
-     Element_Type => Wide_Wide_Character);
+     Element_Type => Integer);
 
    V : Char_Vectors.Vector;
 
@@ -50,14 +51,26 @@ procedure Ned is
    function WWS (Inp : String)
                 return Wide_Wide_String
      renames To_Wide_Wide_String;
+
+   function Natural_As_String (N : Natural) return String is
+      use Ada.Strings.Fixed;
+   begin
+      return Trim (Natural'Image (N), Ada.Strings.Left);
+   end Natural_As_String;
 begin
+   --  load file specified in arguments
    if Argument_Count >= 1 then
       File_Name := To_Unbounded_Wide_Wide_String (WWS (Argument (1)));
       Read_File_To_Buffer (Curr_Buff, Argument (1));
    else
       Add_Line (Curr_Buff, "");
    end if;
+
+   --  tell terminal to save the previous content
    Save_Screen;
+
+   --  Buffer initialization
+   Curr_Buff.Modified := False;
    Curr_Buff.Pos_Line_Nr := 0;
    Curr_Buff.Pos_On_Line := 0;
 
@@ -77,15 +90,19 @@ begin
       end if;
       Put (To_Wide_Wide_String (File_Name));
       Put (WWS (
-        " L:" & Natural'Image (Curr_Buff.Pos_Line_Nr) &
-        " C:" & Natural'Image (Curr_Buff.Pos_On_Line)));
+        " L:" & Natural_As_String (Curr_Buff.Pos_Line_Nr + 1) &
+        "/" & Natural_As_String (Curr_Buff.Lines.Last_Index + 1) &
+        " C:" & Natural_As_String (Curr_Buff.Pos_On_Line)));
 
+      --  DEBUG: print entered char codes. Will be removed at some point
+      Set_Background_Color (Red);
       for E of V loop
-         Put (WWS (" ") & WWS (Integer'Image (Wide_Wide_Character'Pos (E))));
+         Put (WWS (" ") & WWS (Natural_As_String (E)));
       end loop;
       Set_Background_Color (Default);
       Set_Foreground_Color (Default);
 
+      --  Read character from stdin
       begin
          Get_Immediate (In_Ch);
          Pos := Wide_Wide_Character'Pos (In_Ch);
@@ -93,7 +110,7 @@ begin
          when Ada.IO_Exceptions.End_Error => Pos := 4;
       end;
 
-      V.Append (In_Ch);
+      V.Append (Pos);
       if Natural (V.Length) > 10 then
          V.Delete (V.First_Index);
       end if;
