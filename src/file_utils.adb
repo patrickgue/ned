@@ -34,7 +34,7 @@ package body File_Utils is
       Close (F);
    end Read_File_To_Buffer;
 
-   procedure Write_File_From_Buffer (Buff : Buffer; File_Name : String)
+   procedure Write_File_From_Buffer (Buff : in out Buffer; File_Name : String)
    is
       F : File_Type;
    begin
@@ -43,5 +43,6 @@ package body File_Utils is
          Put_Line (F, To_Wide_Wide_String (Buff.Lines (I).Content));
       end loop;
       Close (F);
+      Buff.Modified := False;
    end Write_File_From_Buffer;
 end File_Utils;

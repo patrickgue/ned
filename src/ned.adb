@@ -46,7 +46,6 @@ procedure Ned is
    Main_Loop : Boolean := True;
    File_Name : Unbounded_Wide_Wide_String
      := To_Unbounded_Wide_Wide_String ("UNTITLED");
-   Edited : Boolean := True;
 
    function WWS (Inp : String)
                 return Wide_Wide_String
@@ -71,10 +70,10 @@ begin
       Set_Background_Color (Blue);
       Set_Foreground_Color (White);
 
-      if Edited then
-         Put ("*");
+      if Curr_Buff.Modified then
+         Put ("* ");
       else
-         Put (" ");
+         Put ("  ");
       end if;
       Put (To_Wide_Wide_String (File_Name));
       Put (WWS (
@@ -104,7 +103,7 @@ begin
                when 'x' => Main_Loop := False;
                when 'w' => Write_File_From_Buffer (Curr_Buff,
                   To_String (
-                  To_Wide_Wide_String (File_Name))); Edited := False;
+                  To_Wide_Wide_String (File_Name)));
                when 'A' | 'k' => Move_Cursor (Curr_Buff, Up);
                when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
                when 'C' | 'l' => Move_Cursor (Curr_Buff, Right);
@@ -114,17 +113,14 @@ begin
 
             if Pos = 126 then
                Delete_Char_At_Pos (Curr_Buff, Forward);
-               Edited := True;
             end if;
 
             --  arrow keys are ESC[A|B|C|D -> keep ESC := True
             if Pos /= 91 and then Pos /= 51 then
                Esc := False;
             end if;
-
          else
             Insert_Char_At_Pos (Curr_Buff, In_Ch);
-            Edited := True;
          end if;
       else
          case Pos is
@@ -133,11 +129,11 @@ begin
             when 4 => Delete_Char_At_Pos (Curr_Buff, Forward);     --  C-d
             when 5 => Move_Cursor (Curr_Buff, End_Line);           --  C-e
             when 6 => Move_Cursor (Curr_Buff, Right);              --  C-f
-            when 10 => Newline_At_Pos (Curr_Buff); Edited := True; --  Enter
+            when 10 => Newline_At_Pos (Curr_Buff);                 --  Enter
             when 14 => Move_Cursor (Curr_Buff, Down);              --  C-n
             when 16 => Move_Cursor (Curr_Buff, Up);                --  C-p
-            when 27 => Esc := True;
-            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward); Edited := True;
+            when 27 => Esc := True;                                --  Esc
+            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward);  --  Delete
             when others => null;
          end case;
       end if;

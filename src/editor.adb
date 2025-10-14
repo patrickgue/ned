@@ -70,6 +70,7 @@ package body Editor is
       Buff.Lines (Buff.Pos_Line_Nr).Content
         := To_Unbounded_Wide_Wide_String (First_Half & Char & Second_Half);
       Buff.Pos_On_Line := Buff.Pos_On_Line + 1;
+      Buff.Modified := True;
    end Insert_Char_At_Pos;
 
    -------------------------------------------
@@ -139,8 +140,8 @@ package body Editor is
                Buff.Lines.Delete (Buff.Pos_Line_Nr + 1);
             end if;
          end if;
-
       end if;
+      Buff.Modified := True;
    end Delete_Char_At_Pos;
 
    -----------------------------------
@@ -165,6 +166,7 @@ package body Editor is
         := To_Unbounded_Wide_Wide_String (First_Half);
       Buff.Pos_Line_Nr := Buff.Pos_Line_Nr + 1;
       Buff.Pos_On_Line := 0;
+      Buff.Modified := True;
    end Newline_At_Pos;
 
    procedure Move_Cursor (Buff : in out Buffer; Mov : Virt_Cursor_Movement)
@@ -238,7 +240,8 @@ package body Editor is
          Move_Cursor (1 + Natural (I) - First_Line_Index, 0);
          Set_Attribute (Dim);
          Put (To_Wide_Wide_String (Tail (
-           To_Unbounded_Wide_Wide_String (Integer'Wide_Wide_Image (I + 1)), 4, ' ')
+           To_Unbounded_Wide_Wide_String (
+           Integer'Wide_Wide_Image (I + 1)), 4, ' ')
                                   ) & " ");
          Reset_Attribute (Dim);
          declare

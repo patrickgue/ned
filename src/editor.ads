@@ -38,6 +38,7 @@ package Editor is
       Pos_Line_Nr  : Integer;
       Pos_On_Line  : Integer;
       Lines : Line_Vector.Vector;
+      Modified : Boolean;
    end record;
 
    procedure Add_Line (Buff : in out Buffer; Content : Wide_Wide_String);
