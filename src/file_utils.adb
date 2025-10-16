@@ -22,7 +22,8 @@
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
 with Ada.Strings.UTF_Encoding;
-with Ada.Strings.UTF_Encoding.Wide_Wide_Strings; use Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+with Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
+use Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
 package body File_Utils is
    procedure Read_File_To_Buffer (Buff : in out Buffer; File_Name : String)

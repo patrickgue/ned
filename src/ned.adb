@@ -46,7 +46,6 @@ procedure Ned is
    Esc : Boolean := False;
    Main_Loop : Boolean := True;
 
-
    function WWS (Inp : String)
                 return Wide_Wide_String
      renames To_Wide_Wide_String;
@@ -122,8 +121,8 @@ begin
                when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
                when 'C' | 'l' => Move_Cursor (Curr_Buff, Right);
                when 'D' | 'h' => Move_Cursor (Curr_Buff, Left);
-               when ':' => Process_Command(Curr_Buff);
-               when others => null; -- other keys can be ignored
+               when ':' => Process_Command (Curr_Buff);
+               when others => null; --  other keys can be ignored
             end case;
 
             if Pos = 126 then
