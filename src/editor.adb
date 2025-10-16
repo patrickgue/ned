@@ -286,6 +286,24 @@ package body Editor is
             end if;
          end;
       end loop;
-
    end Render_Buffer;
+
+   -------------------------------------
+   --  P R O C E S S _ C O M M A N D  --
+   -------------------------------------
+
+   procedure Process_Command (Buff : in out Buffer) is
+      Command : Unbounded_Wide_Wide_String;
+   begin
+      Put (":");
+      Command := To_Unbounded_Wide_Wide_String (Get_Line (Standard_Input));
+      declare
+         C : Wide_Wide_String := To_Wide_Wide_String (Command);
+      begin
+         case C (C'First) is
+            when 'o' => null;
+            when others => null;
+         end case;
+      end;
+   end Process_Command;
 end Editor;

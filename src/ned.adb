@@ -45,8 +45,7 @@ procedure Ned is
    Pos : Integer := 0;
    Esc : Boolean := False;
    Main_Loop : Boolean := True;
-   File_Name : Unbounded_Wide_Wide_String
-     := To_Unbounded_Wide_Wide_String ("UNTITLED");
+
 
    function WWS (Inp : String)
                 return Wide_Wide_String
@@ -60,9 +59,9 @@ procedure Ned is
 begin
    --  load file specified in arguments
    if Argument_Count >= 1 then
-      File_Name := To_Unbounded_Wide_Wide_String (WWS (Argument (1)));
       Read_File_To_Buffer (Curr_Buff, Argument (1));
    else
+      Curr_Buff.File_Name := To_Unbounded_Wide_Wide_String ("UNTITLED");
       Add_Line (Curr_Buff, "");
    end if;
 
@@ -88,7 +87,7 @@ begin
       else
          Put ("  ");
       end if;
-      Put (To_Wide_Wide_String (File_Name));
+      Put (To_Wide_Wide_String (Curr_Buff.File_Name));
       Put (WWS (
         " L:" & Natural_As_String (Curr_Buff.Pos_Line_Nr + 1) &
         "/" & Natural_As_String (Curr_Buff.Lines.Last_Index + 1) &
@@ -118,13 +117,12 @@ begin
          if Esc then
             case In_Ch is
                when 'x' => Main_Loop := False;
-               when 'w' => Write_File_From_Buffer (Curr_Buff,
-                  To_String (
-                  To_Wide_Wide_String (File_Name)));
+               when 'w' => Write_File_From_Buffer (Curr_Buff);
                when 'A' | 'k' => Move_Cursor (Curr_Buff, Up);
                when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
                when 'C' | 'l' => Move_Cursor (Curr_Buff, Right);
                when 'D' | 'h' => Move_Cursor (Curr_Buff, Left);
+               when ':' => Process_Command(Curr_Buff);
                when others => null; -- other keys can be ignored
             end case;
 

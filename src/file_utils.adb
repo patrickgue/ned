@@ -21,24 +21,31 @@
 
 with Ada.Wide_Wide_Text_IO; use Ada.Wide_Wide_Text_IO;
 with Ada.Strings.Wide_Wide_Unbounded; use Ada.Strings.Wide_Wide_Unbounded;
+with Ada.Strings.UTF_Encoding;
+with Ada.Strings.UTF_Encoding.Wide_Wide_Strings; use Ada.Strings.UTF_Encoding.Wide_Wide_Strings;
 
 package body File_Utils is
    procedure Read_File_To_Buffer (Buff : in out Buffer; File_Name : String)
    is
-         F : File_Type;
+      F : File_Type;
    begin
+
       Open (F, In_File, File_Name);
       while not End_Of_File (F) loop
          Add_Line (Buff, Get_Line (F));
       end loop;
       Close (F);
+      Buff.File_Name := To_Unbounded_Wide_Wide_String (
+        Decode (Ada.Strings.UTF_Encoding.UTF_8_String (File_Name)));
    end Read_File_To_Buffer;
 
-   procedure Write_File_From_Buffer (Buff : in out Buffer; File_Name : String)
+   procedure Write_File_From_Buffer (Buff : in out Buffer)
    is
       F : File_Type;
+      File_Name_UTF8 : constant Ada.Strings.UTF_Encoding.UTF_8_String
+        := Encode (To_Wide_Wide_String (Buff.File_Name), False);
    begin
-      Open (F, Out_File, File_Name);
+      Create (F, Out_File, String (File_Name_UTF8));
       for I in Buff.Lines.First_Index .. Buff.Lines.Last_Index loop
          Put_Line (F, To_Wide_Wide_String (Buff.Lines (I).Content));
       end loop;

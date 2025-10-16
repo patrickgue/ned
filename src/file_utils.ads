@@ -23,5 +23,5 @@ with Editor; use Editor;
 
 package File_Utils is
    procedure Read_File_To_Buffer (Buff : in out Buffer; File_Name : String);
-   procedure Write_File_From_Buffer (Buff : in out Buffer; File_Name : String);
+   procedure Write_File_From_Buffer (Buff : in out Buffer);
 end File_Utils;

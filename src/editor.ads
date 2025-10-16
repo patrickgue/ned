@@ -33,6 +33,7 @@ package Editor is
      Element_Type => Line_Type);
 
    type Buffer is record
+      File_Name    : Unbounded_Wide_Wide_String;
       Pos_Abs      : Integer;
 
       Pos_Line_Nr  : Integer;
@@ -55,4 +56,5 @@ package Editor is
 
    procedure Render_Buffer (Buff : in out Buffer;
                             Height : Integer);
+   procedure Process_Command (Buff : in out Buffer);
 end Editor;
