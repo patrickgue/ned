@@ -298,10 +298,11 @@ package body Editor is
       Put (":");
       Command := To_Unbounded_Wide_Wide_String (Get_Line (Standard_Input));
       declare
-         C : Wide_Wide_String := To_Wide_Wide_String (Command);
+         C : constant Wide_Wide_String := To_Wide_Wide_String (Command);
       begin
          case C (C'First) is
-            when 'o' => null;
+            when 'o' => Buff.File_Name
+               := To_Unbounded_Wide_Wide_String (C (C'First + 1 .. C'Last));
             when others => null;
          end case;
       end;
