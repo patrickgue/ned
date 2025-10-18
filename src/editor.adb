@@ -73,6 +73,17 @@ package body Editor is
       Buff.Modified := True;
    end Insert_Char_At_Pos;
 
+   -----------------------------------------
+   --  I N S E R T _ T A B _ A T _ P O S  --
+   -----------------------------------------
+
+   procedure Insert_Tab_At_Pos (Buff : in out Buffer) is
+   begin
+      for I in 1 .. Buff.Tab_Len loop
+         Insert_Char_At_Pos (Buff, ' ');
+      end loop;
+   end Insert_Tab_At_Pos;
+
    -------------------------------------------
    --  D E L E T E _ C H A R _ A T _ P O S  --
    -------------------------------------------
@@ -303,6 +314,8 @@ package body Editor is
          case C (C'First) is
             when 'o' => Buff.File_Name
                := To_Unbounded_Wide_Wide_String (C (C'First + 1 .. C'Last));
+            when 't' => Buff.Tab_Len
+               := Natural'Wide_wide_value (C (C'First + 1 .. C'Last));
             when others => null;
          end case;
       end;

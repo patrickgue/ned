@@ -67,6 +67,8 @@ begin
    --  tell terminal to save the previous content
    Save_Screen;
 
+   Hide_Cursor;
+
    --  Buffer initialization
    Curr_Buff.Modified := False;
    Curr_Buff.Pos_Line_Nr := 0;
@@ -143,6 +145,7 @@ begin
             when 4 => Delete_Char_At_Pos (Curr_Buff, Forward);     --  C-d
             when 5 => Move_Cursor (Curr_Buff, End_Line);           --  C-e
             when 6 => Move_Cursor (Curr_Buff, Right);              --  C-f
+            when 9 => Insert_Tab_At_Pos (Curr_Buff);
             when 10 => Newline_At_Pos (Curr_Buff);                 --  Enter
             when 14 => Move_Cursor (Curr_Buff, Down);              --  C-n
             when 16 => Move_Cursor (Curr_Buff, Up);                --  C-p
@@ -152,5 +155,6 @@ begin
          end case;
       end if;
    end loop;
+   Show_Cursor;
    Restore_Screen;
 end Ned;

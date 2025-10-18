@@ -38,12 +38,14 @@ package Editor is
 
       Pos_Line_Nr  : Integer;
       Pos_On_Line  : Integer;
-      Lines : Line_Vector.Vector;
-      Modified : Boolean;
+      Lines        : Line_Vector.Vector;
+      Modified     : Boolean;
+      Tab_Len      : Natural;
    end record;
 
    procedure Add_Line (Buff : in out Buffer; Content : Wide_Wide_String);
    procedure Update_Buffer_Pos_Abs (Buff : in out Buffer);
+   procedure Insert_Tab_At_Pos (Buff : in out Buffer);
    procedure Insert_Char_At_Pos
      (Buff : in out Buffer; Char : Wide_Wide_Character);
    procedure Newline_At_Pos (Buff : in out Buffer);
