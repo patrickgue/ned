@@ -96,6 +96,30 @@ package body VT100 is
         Item => ASCII.ESC & "[?47l");
    end Restore_Screen;
 
+   ----------------------------
+   -- S H O W _ C U R S O R  --
+   ----------------------------
+
+   procedure Show_Cursor
+   is
+   begin
+      Ada.Text_IO.Put
+        (File => Ada.Text_IO.Standard_Output,
+         Item => ASCII.ESC & "[?25h");
+   end Show_Cursor;
+
+   ----------------------------
+   -- H I D E _ C U R S O R  --
+   ----------------------------
+
+   procedure Hide_Cursor
+   is
+   begin
+      Ada.Text_IO.Put
+        (File => Ada.Text_IO.Standard_Output,
+         Item => ASCII.ESC & "[?25l");
+   end Hide_Cursor;
+
    -------------------------------------
    -- U S E _ D E F A U L T _ F O N T --
    -------------------------------------

@@ -35,6 +35,9 @@ package VT100 is
    --  Restore previously saved screen content
    procedure Restore_Screen;
 
+   procedure Show_Cursor;
+   procedure Hide_Cursor;
+
    -----------------
    --  F O N T S  --
    -----------------
