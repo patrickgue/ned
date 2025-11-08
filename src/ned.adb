@@ -55,6 +55,23 @@ procedure Ned is
    begin
       return Trim (Natural'Image (N), Ada.Strings.Left);
    end Natural_As_String;
+
+   procedure Exit_Query is
+      Ch : Wide_Wide_Character := '0';
+   begin
+      Move_Cursor (VT100.Utils.Lines, 1);
+      Erase_Line;
+
+      if Curr_Buff.Modified then
+         Put (WWS ("Buffer was modified. Discard changes? (y/n) "));
+         while not (Ch = 'y' or else Ch = 'n') loop
+            Get_Immediate (Ch);
+         end loop;
+         Main_Loop := Ch = 'n';
+      else
+         Main_Loop := False;
+      end if;
+   end Exit_Query;
 begin
    --  load file specified in arguments
    if Argument_Count >= 1 then
@@ -117,7 +134,7 @@ begin
       if Pos >= 32 and then Pos /= 127 then
          if Esc then
             case In_Ch is
-               when 'x' => Main_Loop := False;
+               when 'x' => Exit_Query;
                when 'w' => Write_File_From_Buffer (Curr_Buff);
                when 'A' | 'k' => Move_Cursor (Curr_Buff, Up);
                when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
