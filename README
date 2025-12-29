@@ -28,10 +28,12 @@ vi-commands need to be prefixed with the [alt] key:
   [alt]-k | [C]-p | Arrow up     Cursor Up
   [alt]-l | [C]-f | Arrow right  Cursor Right
             [C]-e                Cursor to End of line
+
             [C]-a                Cursor to Start of line
 
                     Backspace    Backward delete
-                    Delete       Forward delete
+            [C]-d   Delete       Forward delete
+            [C]-k                Delete line after cursor
 
 license and credit
 ------------------
