@@ -43,6 +43,8 @@ package Editor is
       Tab_Len      : Natural;
    end record;
 
+   type Clear_Strategy is (Clear_Screen, Clear_Line);
+
    procedure Add_Line (Buff : in out Buffer; Content : Wide_Wide_String);
    procedure Update_Buffer_Pos_Abs (Buff : in out Buffer);
    procedure Insert_Tab_At_Pos (Buff : in out Buffer);
@@ -52,11 +54,13 @@ package Editor is
 
    type Delete_Direction is (Forward, Backward);
    procedure Delete_Char_At_Pos (Buff : in out Buffer; Dir : Delete_Direction);
-
+   procedure Delete_Rest_Of_Line (Buff : in out Buffer);
    type Virt_Cursor_Movement is (Left, Right, Up, Down, Start, End_Line);
-   procedure Move_Cursor (Buff : in out Buffer; Mov : Virt_Cursor_Movement);
+   procedure Move_Cursor (Buff : in out Buffer; Mov : Virt_Cursor_Movement; Clear_Strat: in out Clear_Strategy);
+
 
    procedure Render_Buffer (Buff : in out Buffer;
-                            Height : Integer);
+                            Height : Integer;
+                            Abs_Line : in out Integer);
    procedure Process_Command (Buff : in out Buffer);
 end Editor;

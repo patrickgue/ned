@@ -45,6 +45,8 @@ procedure Ned is
    Pos : Integer := 0;
    Esc : Boolean := False;
    Main_Loop : Boolean := True;
+   Clear_Strat : Clear_Strategy := Clear_Screen;
+   Mod_Visual_Line : Integer := 1;
 
    function WWS (Inp : String)
                 return Wide_Wide_String
@@ -92,9 +94,14 @@ begin
    Curr_Buff.Pos_On_Line := 0;
 
    while Main_Loop loop
-      Clear_Screen;
+      if Clear_Strat = Clear_Screen then
+         Clear_Screen;
+      else
+         Move_Cursor (Mod_Visual_Line + 1, 1);
+         Erase_Line;
+      end if;
 
-      Render_Buffer (Curr_Buff, VT100.Utils.Lines - 2);
+      Render_Buffer (Curr_Buff, VT100.Utils.Lines - 2, Mod_Visual_Line);
       Move_Cursor (VT100.Utils.Lines, 1);
 
       Set_Background_Color (Blue);
@@ -109,7 +116,8 @@ begin
       Put (WWS (
         " L:" & Natural_As_String (Curr_Buff.Pos_Line_Nr + 1) &
         "/" & Natural_As_String (Curr_Buff.Lines.Last_Index + 1) &
-        " C:" & Natural_As_String (Curr_Buff.Pos_On_Line)));
+        " C:" & Natural_As_String (Curr_Buff.Pos_On_Line) &
+        " " & Integer'Image (Mod_Visual_Line)));
 
       --  DEBUG: print entered char codes. Will be removed at some point
       Set_Background_Color (Red);
@@ -136,10 +144,10 @@ begin
             case In_Ch is
                when 'x' => Exit_Query;
                when 'w' => Write_File_From_Buffer (Curr_Buff);
-               when 'A' | 'k' => Move_Cursor (Curr_Buff, Up);
-               when 'B' | 'j' => Move_Cursor (Curr_Buff, Down);
-               when 'C' | 'l' => Move_Cursor (Curr_Buff, Right);
-               when 'D' | 'h' => Move_Cursor (Curr_Buff, Left);
+               when 'A' | 'k' => Move_Cursor (Curr_Buff, Up, Clear_Strat);
+               when 'B' | 'j' => Move_Cursor (Curr_Buff, Down, Clear_Strat);
+               when 'C' | 'l' => Move_Cursor (Curr_Buff, Right, Clear_Strat);
+               when 'D' | 'h' => Move_Cursor (Curr_Buff, Left, Clear_Strat);
                when ':' => Process_Command (Curr_Buff);
                when others => null; --  other keys can be ignored
             end case;
@@ -157,17 +165,18 @@ begin
          end if;
       else
          case Pos is
-            when 1 => Move_Cursor (Curr_Buff, Start);              --  C-a
-            when 2 => Move_Cursor (Curr_Buff, Left);               --  C-b
-            when 4 => Delete_Char_At_Pos (Curr_Buff, Forward);     --  C-d
-            when 5 => Move_Cursor (Curr_Buff, End_Line);           --  C-e
-            when 6 => Move_Cursor (Curr_Buff, Right);              --  C-f
+            when 1 => Move_Cursor (Curr_Buff, Start, Clear_Strat);     --  C-a
+            when 2 => Move_Cursor (Curr_Buff, Left, Clear_Strat);      --  C-b
+            when 4 => Delete_Char_At_Pos (Curr_Buff, Forward);         --  C-d
+            when 5 => Move_Cursor (Curr_Buff, End_Line, Clear_Strat);  --  C-e
+            when 6 => Move_Cursor (Curr_Buff, Right, Clear_Strat);     --  C-f
             when 9 => Insert_Tab_At_Pos (Curr_Buff);
-            when 10 => Newline_At_Pos (Curr_Buff);                 --  Enter
-            when 14 => Move_Cursor (Curr_Buff, Down);              --  C-n
-            when 16 => Move_Cursor (Curr_Buff, Up);                --  C-p
-            when 27 => Esc := True;                                --  Esc
-            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward);  --  Delete
+            when 10 => Newline_At_Pos (Curr_Buff);                     --  Enter
+            when 11 => Delete_Rest_Of_Line (Curr_Buff);                --  C-k
+            when 14 => Move_Cursor (Curr_Buff, Down, Clear_Strat);     --  C-n
+            when 16 => Move_Cursor (Curr_Buff, Up, Clear_Strat);       --  C-p
+            when 27 => Esc := True;                                    --  Esc
+            when 127 => Delete_Char_At_Pos (Curr_Buff, Backward);      --  Delete
             when others => null;
          end case;
       end if;

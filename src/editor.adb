@@ -155,6 +155,15 @@ package body Editor is
       Buff.Modified := True;
    end Delete_Char_At_Pos;
 
+   --------------------------------------------
+   -- D E L E T E _ R E S T _ O F _ L I N E  --
+   --------------------------------------------
+
+   procedure Delete_Rest_Of_Line (Buff : in out Buffer) is
+   begin
+      null;
+   end Delete_Rest_Of_Line;
+
    -----------------------------------
    --  N E W L I N E _ A T _ P O S  --
    -----------------------------------
@@ -180,12 +189,13 @@ package body Editor is
       Buff.Modified := True;
    end Newline_At_Pos;
 
-   procedure Move_Cursor (Buff : in out Buffer; Mov : Virt_Cursor_Movement)
+   procedure Move_Cursor (Buff : in out Buffer; Mov : Virt_Cursor_Movement; Clear_Strat: in out Clear_Strategy)
    is
       Line_Length : constant Integer
         := Length (Buff.Lines (Buff.Pos_Line_Nr).Content);
       New_Length : Integer;
    begin
+      Clear_Strat := Clear_Screen; --  Clear_Screen is the default
       if Mov = Down then
          if Buff.Pos_Line_Nr < Buff.Lines.Last_Index then
             Buff.Pos_Line_Nr := Buff.Pos_Line_Nr + 1;
@@ -195,6 +205,7 @@ package body Editor is
          if Buff.Pos_On_Line > New_Length then
             Buff.Pos_On_Line := New_Length;
          end if;
+
       elsif Mov = Up then
          if Buff.Pos_Line_Nr > Buff.Lines.First_Index then
             Buff.Pos_Line_Nr := Buff.Pos_Line_Nr - 1;
@@ -205,19 +216,20 @@ package body Editor is
          else
             Buff.Pos_On_Line := 0;
          end if;
-
       elsif Mov = Right then
          if Buff.Pos_On_Line < Line_Length then
             Buff.Pos_On_Line := Buff.Pos_On_Line + 1;
+            Clear_Strat := Clear_Line;
          else
-            Move_Cursor (Buff, Down);
+            Move_Cursor (Buff, Down, Clear_Strat);
             Buff.Pos_On_Line := 0;
          end if;
       elsif Mov = Left then
          if Buff.Pos_On_Line > 0 then
             Buff.Pos_On_Line := Buff.Pos_On_Line - 1;
+            Clear_Strat := Clear_Line;
          else
-            Move_Cursor (Buff, Up);
+            Move_Cursor (Buff, Up, Clear_Strat);
             Buff.Pos_On_Line := Line_Length;
          end if;
       elsif Mov = Start then
@@ -232,7 +244,8 @@ package body Editor is
    --------------------------------
 
    procedure Render_Buffer (Buff : in out Buffer;
-                            Height : Integer)
+                            Height : Integer;
+                            Abs_Line : in out Integer)
    is
       First_Line_Index : Integer;
       Last_Line_Index : Integer;
@@ -264,6 +277,7 @@ package body Editor is
             end if;
 
             if I = Buff.Pos_Line_Nr then
+               Abs_Line := I - First_Line_Index;
                declare
                   Line_Str : constant Wide_Wide_String
                     := To_Wide_Wide_String (Content_Line.Content);
